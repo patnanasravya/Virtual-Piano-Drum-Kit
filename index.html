@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Piano & Drum Kit</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    text-align:center;
+    background:#222;
+    color:white;
+    padding:20px;
+}
+
+h1{
+    margin-bottom:20px;
+}
+
+.section{
+    margin:30px 0;
+}
+
+.piano{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:5px;
+}
+
+.key{
+    width:70px;
+    height:220px;
+    background:white;
+    color:black;
+    border:2px solid #000;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.key:active{
+    background:#ddd;
+}
+
+.drums{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:15px;
+}
+
+.pad{
+    width:100px;
+    height:100px;
+    border:none;
+    border-radius:50%;
+    background:#ff5722;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.pad:active{
+    transform:scale(0.95);
+}
+
+.info{
+    margin-top:20px;
+    color:#ccc;
+}
+</style>
+</head>
+<body>
+
+<h1>🎹 Virtual Piano & 🥁 Drum Kit</h1>
+
+<div class="section">
+<h2>Piano</h2>
+
+<div class="piano">
+<button class="key" onclick="playPiano(261.63)">A<br>C</button>
+<button class="key" onclick="playPiano(293.66)">S<br>D</button>
+<button class="key" onclick="playPiano(329.63)">D<br>E</button>
+<button class="key" onclick="playPiano(349.23)">F<br>F</button>
+<button class="key" onclick="playPiano(392.00)">G<br>G</button>
+<button class="key" onclick="playPiano(440.00)">H<br>A</button>
+<button class="key" onclick="playPiano(493.88)">J<br>B</button>
+</div>
+</div>
+
+<div class="section">
+<h2>Drum Kit</h2>
+
+<div class="drums">
+<button class="pad" onclick="playDrum(120)">Q</button>
+<button class="pad" onclick="playDrum(180)">W</button>
+<button class="pad" onclick="playDrum(250)">E</button>
+<button class="pad" onclick="playDrum(320)">R</button>
+</div>
+</div>
+
+<div class="info">
+<p>Piano Keys: A S D F G H J</p>
+<p>Drum Pads: Q W E R</p>
+</div>
+
+<script>
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+function playPiano(freq){
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = freq;
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.start();
+
+    gainNode.gain.setValueAtTime(1, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime + 1
+    );
+
+    oscillator.stop(audioContext.currentTime + 1);
+}
+
+function playDrum(freq){
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.type = "square";
+    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    gainNode.gain.setValueAtTime(1, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime + 0.2
+    );
+
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.2);
+}
+
+document.addEventListener("keydown", function(e){
+
+    switch(e.key.toLowerCase()){
+
+        case "a": playPiano(261.63); break;
+        case "s": playPiano(293.66); break;
+        case "d": playPiano(329.63); break;
+        case "f": playPiano(349.23); break;
+        case "g": playPiano(392.00); break;
+        case "h": playPiano(440.00); break;
+        case "j": playPiano(493.88); break;
+
+        case "q": playDrum(120); break;
+        case "w": playDrum(180); break;
+        case "e": playDrum(250); break;
+        case "r": playDrum(320); break;
+    }
+});
+</script>
+
+</body>
+</html>
